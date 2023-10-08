@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "CRM.DTOs/1.0.0": {
+        "runtime": {
+          "CRM.DTOs.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CRM.DTOs/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

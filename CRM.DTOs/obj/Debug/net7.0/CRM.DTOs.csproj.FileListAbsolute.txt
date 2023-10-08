@@ -1,0 +1,11 @@
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\bin\Debug\net7.0\CRM.DTOs.deps.json
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\bin\Debug\net7.0\CRM.DTOs.dll
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\bin\Debug\net7.0\CRM.DTOs.pdb
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\obj\Debug\net7.0\CRM.DTOs.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\obj\Debug\net7.0\CRM.DTOs.AssemblyInfoInputs.cache
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\obj\Debug\net7.0\CRM.DTOs.AssemblyInfo.cs
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\obj\Debug\net7.0\CRM.DTOs.csproj.CoreCompileInputs.cache
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\obj\Debug\net7.0\CRM.DTOs.dll
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\obj\Debug\net7.0\refint\CRM.DTOs.dll
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\obj\Debug\net7.0\CRM.DTOs.pdb
+C:\Users\jc997\Desktop\Practica5\XJSC\CRM.DTOs\obj\Debug\net7.0\ref\CRM.DTOs.dll
