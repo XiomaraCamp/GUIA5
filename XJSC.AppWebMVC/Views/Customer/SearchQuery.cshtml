@@ -1,0 +1,113 @@
+﻿@model SearchQueryCustomerDTO
+@{
+    int totalRegistros = (int)ViewBag.CountRow;
+    int totalPaginas = (int)Math.Ceiling((double)totalRegistros / Model.Take);
+}
+
+<h4>Buscar Cliente</h4>
+<hr />
+<div class="row">
+    <form asp-action="Index">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input asp-for="SendRowCount" type="hidden" id="txtSendRowCount" />
+        <input asp-for="Skip" type="hidden" id="txtSkip" />
+        <input name="CountRow" value="@totalRegistros" type="hidden" />
+
+        <div class="row">
+            <div class="col-4">
+                <div class="form-group">
+                    <label asp-for="Name_Like" class="control-label"></label>
+                    <input asp-for="Name_Like" class="form-control" />
+                    <span asp-validation-for="Name_Like" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="form-group">
+                    <label asp-for="LastName_Like" class="control-label"></label>
+                    <input asp-for="LastName_Like" class="form-control" />
+                    <span asp-validation-for="LastName_Like" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-2">
+                <div class="form-group">
+                    <label asp-for="Take" class="control-label"></label>
+                    <select asp-for="Take" class="form-control">
+                        @for (var i = 10; i < 1000; i += 10)
+                        {
+                            if (i == Model.Take)
+                            {
+                                <option selected value="@i">@i</option>
+                            }
+                            else
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="Take" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <input type="submit" id="btnSearch" value="Buscar" class="btn btn-primary" />
+                    <a asp-action="Create" class="btn btn-primary">Ir Crear</a>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <div class="row" style="overflow:auto !important">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    @{
+                        int skipAnte = Model.Skip > 0 ? Model.Skip - Model.Take : 0;
+                        int skipMax = 0;
+                    }
+                    <li class="page-item"><a class="page-link" data-skip="@skipAnte" href="#" onclick="paginacion(this)">Anterior</a></li>
+                    @for (var i = 0; i < totalPaginas; i++)
+                    {
+                        int skip = i * Model.Take;
+                        int numPag = i + 1;
+                        if (skip != Model.Skip)
+                        {
+                            <li class="page-item"><a class="page-link" data-skip="@skip" href="#" onclick="paginacion(this)">@numPag</a></li>
+                        }
+                        else
+                        {
+                            <li class="page-item active"><a class="page-link" data-skip="@skip" href="#" onclick="paginacion(this)">@numPag</a></li>
+                        }
+                        skipMax = skip;
+                    }
+                    @{
+                        int skipSi = Model.Skip + Model.Take;
+                        skipSi = skipSi > skipMax ? skipSi - Model.Take : skipSi;
+                    }
+                    <li class="page-item"><a class="page-link" data-skip="@skipSi" href="#" onclick="paginacion(this)">Siguiente</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="row-cols-6">
+            <span>Total registros: @totalRegistros</span>
+        </div>
+    </form>
+</div>
+
+<script>
+    function paginacion(li) {
+        const skip = li.getAttribute("data-skip");
+        const btnSearch = document.getElementById("btnSearch");
+        const txtSkip = document.getElementById("txtSkip");
+        const txtSendRowCount = document.getElementById("txtSendRowCount");
+        txtSkip.value = skip;
+        txtSendRowCount.value = 1;
+        btnSearch.click();
+    }
+</script>
+

@@ -1,0 +1,89 @@
+﻿@page "/edit-customer/{Id:int}"
+
+@using XJSC.DTOs.CustomerDTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.ComponentModel.DataAnnotations;
+@using XJSC.AppWebBlazor.Data;
+
+
+@if (isSuccess == false && isError == false)
+{
+    <h3>Modificar Cliente</h3>
+    <EditForm Model="customer" OnValidSubmit="Edit">
+        <DataAnnotationsValidator />
+        <div class="row">
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="Name">Nombre:</label>
+                    <InputText class="form-control" id="Name" @bind-Value="customer.Name" />
+                    <ValidationMessage For="() => customer.Name" />
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="LastName">Nombre:</label>
+                    <InputText class="form-control" id="LastName" @bind-Value="customer.LastName" />
+                    <ValidationMessage For="() => customer.LastName" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="Address">Direccion:</label>
+                    <InputText class="form-control" id="Address" @bind-Value="customer.Address" />
+                    <ValidationMessage For="() => customer.Address" />
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Modificar</button>
+                <NavLink href="/customer-list" class="btn btn-secondary">Cancelar</NavLink>
+            </div>
+        </div>
+    </EditForm>
+}
+else if (isSuccess)
+{
+    customer = new EditCustomerDTO();
+    isError = false;
+    <p class="alert alert-success">Cliente se modifico con exito!</p>
+    <NavLink href="/customer-list" class="btn btn-primary">Aceptar</NavLink>
+
+}
+else if (isError)
+{
+    <p class="alert alert-success">Sucedio un errror al intetar Modificar. O no ha realizado ninguna modificacion al registro acttual</p>
+    <NavLink href="/customer-list" class="btn btn-primary">Aceptar</NavLink>
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Inject]
+    CustomerService customerService { get; set; }
+
+    EditCustomerDTO customer = new EditCustomerDTO();
+    bool isSuccess = false;
+    bool isError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var customerDetail = await customerService.GetById(Id);
+
+        customer = new EditCustomerDTO(customerDetail);
+    }
+    private async Task Edit()
+    {
+        int result = await customerService.Edit(customer);
+
+        if (result != 0)
+            isSuccess = true;
+        else
+            isError = true;
+    }
+}

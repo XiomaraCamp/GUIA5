@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using XJSC.DTOs.CustomerDTOs;
+﻿using XJSC.DTOs.CustomerDTOs;
+using Microsoft.AspNetCore.Mvc;
 
 namespace XJSC.AppWebMVC.Controllers
 {
@@ -12,28 +12,28 @@ namespace XJSC.AppWebMVC.Controllers
             _httpClientXJSCAPI = httpClientFactory.CreateClient("XJSCAPI");
         }
 
-        public async Task<IActionResult> Index(SearchQueryCustomerDTO queryCustomerDTO, int CountRow = 0)
+        public async Task<IActionResult> Index(SearchQueryCustomerDTO searchQueryCustomerDTO, int CountRow = 0)
         {
-            if (queryCustomerDTO.SendRowCount == 0)
-                queryCustomerDTO.SendRowCount = 2;
-            if (queryCustomerDTO.Take == 0)
-                queryCustomerDTO.Take = 10;
+            if (searchQueryCustomerDTO.SendRowCount == 0)
+                searchQueryCustomerDTO.SendRowCount = 2;
+            if (searchQueryCustomerDTO.Take == 0)
+                searchQueryCustomerDTO.Take = 10;
 
             var result = new SearchResultCustomerDTO();
 
-            var response = await _httpClientXJSCAPI.PostAsJsonAsync("/customer/search", queryCustomerDTO);
+            var response = await _httpClientXJSCAPI.PostAsJsonAsync("/customer/search", searchQueryCustomerDTO);
 
             if (response.IsSuccessStatusCode)
                 result = await response.Content.ReadFromJsonAsync<SearchResultCustomerDTO>();
 
             result = result != null ? result : new SearchResultCustomerDTO();
 
-            if (result.CountRow == 0 && queryCustomerDTO.SendRowCount == 1)
+            if (result.CountRow == 0 && searchQueryCustomerDTO.SendRowCount == 1)
                 result.CountRow = CountRow;
 
             ViewBag.CountRow = result.CountRow;
-            queryCustomerDTO.SendRowCount = 0;
-            ViewBag.SearchQuery = queryCustomerDTO;
+            searchQueryCustomerDTO.SendRowCount = 0;
+            ViewBag.SearchQuery = searchQueryCustomerDTO;
 
             return View(result);
         }
@@ -46,22 +46,19 @@ namespace XJSC.AppWebMVC.Controllers
 
             if (response.IsSuccessStatusCode)
                 result = await response.Content.ReadFromJsonAsync<GetIdResultCustomerDTO>();
-
             return View(result ?? new GetIdResultCustomerDTO());
         }
-
         public ActionResult Create()
         {
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateCustomerDTO createDTO)
+        public async Task<IActionResult> Create(CreateCustomerDTO createCustomerDTO)
         {
             try
             {
-                var response = await _httpClientXJSCAPI.PostAsJsonAsync("/customer", createDTO);
+                var response = await _httpClientXJSCAPI.PostAsJsonAsync("/customer", createCustomerDTO);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -72,11 +69,11 @@ namespace XJSC.AppWebMVC.Controllers
             }
             catch (Exception ex)
             {
+
                 ViewBag.Error = ex.Message;
                 return View();
             }
         }
-
         public async Task<IActionResult> Edit(int id)
         {
             var result = new GetIdResultCustomerDTO();
@@ -87,14 +84,13 @@ namespace XJSC.AppWebMVC.Controllers
 
             return View(new EditCustomerDTO(result ?? new GetIdResultCustomerDTO()));
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, EditCustomerDTO editDTO)
+        public async Task<IActionResult> Edit(int id, EditCustomerDTO editCustomerDTO)
         {
             try
             {
-                var response = await _httpClientXJSCAPI.PutAsJsonAsync("/customer", editDTO);
+                var response = await _httpClientXJSCAPI.PutAsJsonAsync("/customer", editCustomerDTO);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -105,9 +101,11 @@ namespace XJSC.AppWebMVC.Controllers
             }
             catch (Exception ex)
             {
+
                 ViewBag.Error = ex.Message;
                 return View();
             }
+
         }
 
         public async Task<IActionResult> Delete(int id)
@@ -117,13 +115,11 @@ namespace XJSC.AppWebMVC.Controllers
 
             if (response.IsSuccessStatusCode)
                 result = await response.Content.ReadFromJsonAsync<GetIdResultCustomerDTO>();
-
             return View(result ?? new GetIdResultCustomerDTO());
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, GetIdResultCustomerDTO getIdResultDTO)
+        public async Task<IActionResult> Delete(int id, GetIdResultCustomerDTO getIdResultCustomerDTO)
         {
             try
             {
@@ -134,14 +130,17 @@ namespace XJSC.AppWebMVC.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 ViewBag.Error = "Error al intentar eliminar el registro";
-                return View(getIdResultDTO);
+                return View(getIdResultCustomerDTO);
             }
             catch (Exception ex)
             {
+
                 ViewBag.Error = ex.Message;
-                return View(getIdResultDTO);
+                return View(getIdResultCustomerDTO);
             }
         }
     }
 }
+
+
 

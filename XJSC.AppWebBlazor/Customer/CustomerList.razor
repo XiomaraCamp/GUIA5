@@ -1,0 +1,187 @@
+﻿@page "/customer-list"
+@using XJSC.DTOs.CustomerDTOs;
+@using System.Text.Json;
+@using Microsoft.AspNetCore.Components;
+@using Microsoft.AspNetCore.Components.Forms;
+@using XJSC.AppWebBlazor.Data;
+
+<h3>Buscar Cliente</h3>
+<EditForm Model="searchQuery" OnValidSubmit="SubmitSearch">
+    <div class="row">
+        <div class="col-3">
+            <div class="form-group">
+                <label form="Name">Nombre:</label>
+                <InputText class="form-control" @bind-Value="searchQuery.Name_Like" />
+            </div>
+        </div>
+
+        <div class="col-3">
+            <div class="form-group">
+                <label form="LastName">Apellido:</label>
+                <InputText class="form-control" @bind-Value="searchQuery.LastName_Like" />
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="form-group">
+                <label form="Take">CantReg X Pagina</label>
+                <select class="form-control" @bind="searchQuery.Take">
+                    @for (var i = 10; i < 1000; i += 10)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Buscar</button>
+    <NavLink href="/create-customer" class="btn btn-secondary">Ir a crear</NavLink>
+    <br />
+</EditForm>
+<h3>Lista de Clientes</h3>
+<div class="row" style="overflow:auto !important; max-width:600px">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <NavLink class="page-link" @onclick="async () => await PaginationSearch(skipAnte)">Anterior</NavLink>
+            </li>
+            @foreach (var item in paginations)
+            {
+                if (item.Skip != searchQuery.Skip)
+                {
+                    <li class="pege-item">
+                        <NavLink class="page-link" @onclick="async ()=> await PaginationSearch(item.Skip)">@item.NumPage</NavLink>
+                    </li>
+                }
+            }
+            <NavLink class="page-link" @onclick="async ()=> await PaginationSearch(skipSi)">Siguiente</NavLink>
+        </ul>
+    </nav>
+</div>
+<div class="row-cols-6">
+    <span>Total registros: @searchResult.CountRow</span>
+</div>
+@if (searchResult != null && searchResult.Data != null && searchResult.Data.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Direccion</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in searchResult.Data)
+            {
+                <tr>
+                    <td>@customer.Name</td>
+                    <td>@customer.LastName</td>
+                    <td>@customer.Address</td>
+                    <td>
+                        <button class="btn btn-dark" @onclick="() =>GoEdit(customer.Id)">Editar</button>
+                        <button class="btn btn-info" @onclick="() =>GoDetails(customer.Id)">ver</button>
+                        <button class="btn btn-danger" @onclick="() =>GoDelete(customer.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    [Inject]
+    CustomerService customerService { get; set; }
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    SearchResultCustomerDTO searchResult = new SearchResultCustomerDTO();
+    SearchQueryCustomerDTO searchQuery = new SearchQueryCustomerDTO { Take = 10 };
+    List<Pagination> paginations = new List<Pagination>();
+    int skipAnte = 0;
+    int skipSi = 0;
+
+    private async Task Search()
+    {
+        searchResult = await customerService.Search(searchQuery);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        searchQuery.SendRowCount = 2;
+        searchQuery.Skip = 0;
+
+        await Search();
+
+        UpdatePagination();
+    }
+    private async Task SubmitSearch()
+    {
+        searchQuery.SendRowCount = 2;
+        searchQuery.Skip = 0;
+
+        await Search();
+
+        UpdatePagination();
+    }
+    private async Task PaginationSearch(int skip)
+    {
+        int countRowTemp = searchResult.CountRow;
+
+        searchQuery.SendRowCount = 1;
+        searchQuery.Skip = skip;
+
+        await Search();
+
+        searchResult.CountRow = countRowTemp;
+
+        UpdatePagination();
+    }
+    private void GoEdit(int customerId)
+    {
+        navigation.NavigateTo($"/edit-customer/{customerId}");
+    }
+
+    private void GoDetails(int customerId)
+    {
+        navigation.NavigateTo($"/customer-details/{customerId}");
+    }
+
+    private void GoDelete(int customerId)
+    {
+        navigation.NavigateTo($"/delete-customer/{customerId}");
+    }
+
+    private void UpdatePagination()
+    {
+        paginations = new List<Pagination>();
+
+        int totalPages = (int)Math.Ceiling((double)searchResult.CountRow / searchQuery.Take);
+
+        skipAnte = searchQuery.Skip > 0 ? searchQuery.Skip - searchQuery.Take : 0;
+        int skipMax = 0;
+
+        for (var i = 0; i < totalPages; i++)
+        {
+            var pagination = new Pagination()
+                {
+                    Skip = i * searchQuery.Take,
+                    NumPage = i + 1
+                };
+            paginations.Add(pagination);
+            skipMax = pagination.Skip;
+        }
+        skipSi = searchQuery.Skip + searchQuery.Take;
+        skipSi = skipSi > skipMax ? skipSi - searchQuery.Take : skipSi;
+    }
+
+
+
+    class Pagination
+    {
+        public int NumPage { get; set; }
+        public int Skip { get; set; }
+    }
+}
+
+     

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\XJSC.AppWebMVC.props" />
+</Project>

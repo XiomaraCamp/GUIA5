@@ -1,0 +1,55 @@
+﻿@page "/customer-details/{Id:int}"
+@using XJSC.AppWebBlazor.Data
+@using XJSC.DTOs.CustomerDTOs;
+@using Microsoft.AspNetCore.Components.Forms;
+
+<h3>Ver Cliente</h3>
+<div class="row">
+    <div class="col-4">
+        <div class="form-group">
+            <label for="Name">Nombre:</label>
+            <input type="text" class="form-control" disabled @bind="customer.Name" />
+        </div>
+    </div>
+
+    <div class="col-4">
+        <div class="form-group">
+            <label for="LastName">Apellido:</label>
+            <input type="text" class="form-control" disabled @bind="customer.LastName" />
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="form-group">
+            <label for="Address">Direccion:</label>
+            <textarea disabled class="form-control" @bind="customer.Address"></textarea>
+        </div>
+    </div>
+</div>
+<br>
+
+<div class="row">
+    <div class="col-12">
+
+        <NavLink href="/customer-list" class="btn btn-primary">Ir a buscar Clientes</NavLink>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Inject]
+    CustomerService customerService { get; set; }
+
+    GetIdResultCustomerDTO customer = new GetIdResultCustomerDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        customer = await customerService.GetById(Id);
+    }
+}
+
+
