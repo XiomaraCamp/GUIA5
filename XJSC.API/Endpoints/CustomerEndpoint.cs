@@ -6,37 +6,40 @@ namespace XJSC.API.Endpoints
 {
     public static class CustomerEndpoint
     {
-        public static void AddCustomerEndpoint(this WebApplication app)
+        public static void AddCustomerEndpoints(this WebApplication app)
         {
-            app.MapPost("/customer/search", async (SearchQueryCustomerDTO cDTO, CustomerDAL cDAL) =>
+            app.MapPost("/customer/search", async (SearchQueryCustomerDTO customerDTO, CustomerDAL customerDAL) =>
             {
                 var customer = new Customer
                 {
-                    Name = cDTO.Name_Like != null ? cDTO.Name_Like : string.Empty,
-                    LastName = cDTO.LastName_Like != null ? cDTO.LastName_Like : string.Empty
+                    Name = customerDTO.Name_Like != null ? customerDTO.Name_Like : string.Empty,
+                    LastName = customerDTO.LastName_Like != null ? customerDTO.LastName_Like : string.Empty
                 };
 
                 var customers = new List<Customer>();
                 int countRow = 0;
 
-                if (cDTO.SendRowCount == 2)
+                if (customerDTO.SendRowCount == 2)
                 {
-                    customers = await cDAL.Search(customer, skip: cDTO.Skip, take: cDTO.Take);
+                    // Realizar una búsqueda de clientes y contar las filas
+                    customers = await customerDAL.Search(customer, skip: customerDTO.Skip, take: customerDTO.Take);
                     if (customers.Count > 0)
-                        countRow = await cDAL.CountSearch(customer);
+                        countRow = await customerDAL.CountSearch(customer);
                 }
                 else
                 {
-                    customers = await cDAL.Search(customer, skip: cDTO.Skip, take: cDTO.Take);
+                    // Realizar una búsqueda de clientes sin contar las filas
+                    customers = await customerDAL.Search(customer, skip: customerDTO.Skip, take: customerDTO.Take);
                 }
 
-
+                // Crear un objeto 'SearchResultCustomerDTO' para almacenar los resultados
                 var customerResult = new SearchResultCustomerDTO
                 {
                     Data = new List<SearchResultCustomerDTO.CustomerDTO>(),
                     CountRow = countRow
                 };
 
+                // Mapear los resultados a objetos 'CustomerDTO' y agregarlos al resultado
                 customers.ForEach(s => {
                     customerResult.Data.Add(new SearchResultCustomerDTO.CustomerDTO
                     {
@@ -46,12 +49,15 @@ namespace XJSC.API.Endpoints
                         Address = s.Address
                     });
                 });
+
+                // Devolver los resultados
                 return customerResult;
             });
 
             app.MapGet("/customer/{id}", async (int id, CustomerDAL customerDAL) =>
             {
                 var customer = await customerDAL.GetById(id);
+
                 var customerResult = new GetIdResultCustomerDTO
                 {
                     Id = customer.Id,
@@ -66,13 +72,13 @@ namespace XJSC.API.Endpoints
                     return Results.NotFound(customerResult);
             });
 
-            app.MapPost("/customer", async (CreateCustomerDTO createDTO, CustomerDAL customerDAL) =>
+            app.MapPost("/customer", async (CreateCustomerDTO customerDTO, CustomerDAL customerDAL) =>
             {
                 var customer = new Customer
                 {
-                    Name = createDTO.Name,
-                    LastName = createDTO.LastName,
-                    Address = createDTO.Address
+                    Name = customerDTO.Name,
+                    LastName = customerDTO.LastName,
+                    Address = customerDTO.Address
                 };
 
                 int result = await customerDAL.Create(customer);
@@ -82,14 +88,14 @@ namespace XJSC.API.Endpoints
                     return Results.StatusCode(500);
             });
 
-            app.MapPut("/customer", async (EditCustomerDTO EditDTO, CustomerDAL customerDAL) =>
+            app.MapPut("/customer", async (EditCustomerDTO customerDTO, CustomerDAL customerDAL) =>
             {
                 var customer = new Customer
                 {
-                    Id = EditDTO.Id,
-                    Name = EditDTO.Name,
-                    LastName = EditDTO.LastName,
-                    Address = EditDTO.Address
+                    Id = customerDTO.Id,
+                    Name = customerDTO.Name,
+                    LastName = customerDTO.LastName,
+                    Address = customerDTO.Address
                 };
 
                 int result = await customerDAL.Edit(customer);

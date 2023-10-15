@@ -1,8 +1,7 @@
-﻿-- Se crea la base de datos JGQZ
-create database CRMDB
+﻿create database CRMDB
 go
 
--- Usa la base de datos JGQZ
+
 use CRMDB
 go
 
